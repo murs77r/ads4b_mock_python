@@ -1,0 +1,64 @@
+name: Test Results
+
+on:
+  push:
+    paths-ignore:
+      - "test-results/**/*.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  tests:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run tests and save output
+        id: tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p test-results
+          RESULT_FILE="test-results/test-results-${{ github.run_id }}-${{ github.run_attempt }}.txt"
+          python -m unittest discover -s tests -v 2>&1 | tee "$RESULT_FILE"
+          STATUS=${PIPESTATUS[0]}
+          {
+            echo
+            echo "Exit code: $STATUS"
+          } >> "$RESULT_FILE"
+          echo "result_file=$RESULT_FILE" >> "$GITHUB_OUTPUT"
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          exit "$STATUS"
+
+      - name: Commit test result
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ls -1t test-results/test-results-*.txt 2>/dev/null | tail -n +21 | xargs -r rm -f
+          git add -A test-results
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "chore: salvar resultado dos testes [skip ci] run ${{ github.run_id }} status ${{ steps.tests.outputs.status }}"
+          git push
+
+      - name: Fail workflow when tests fail
+        if: always() && steps.tests.outputs.status != '0'
+        shell: bash
+        run: exit 1
