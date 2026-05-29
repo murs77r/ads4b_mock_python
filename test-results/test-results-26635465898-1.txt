@@ -1,0 +1,12 @@
+test_ct01_score_muito_baixo_retorna_negado (test_credito.ProcessadorCreditoTest.test_ct01_score_muito_baixo_retorna_negado) ... ok
+test_ct02_score_medio_valor_alto_retorna_negado (test_credito.ProcessadorCreditoTest.test_ct02_score_medio_valor_alto_retorna_negado) ... ok
+test_ct03_score_medio_valor_baixo_retorna_aprovado (test_credito.ProcessadorCreditoTest.test_ct03_score_medio_valor_baixo_retorna_aprovado) ... ok
+test_ct04_score_alto_retorna_aprovado (test_credito.ProcessadorCreditoTest.test_ct04_score_alto_retorna_aprovado) ... ok
+test_ct05_servico_offline_retorna_negado (test_credito.ProcessadorCreditoTest.test_ct05_servico_offline_retorna_negado) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.010s
+
+OK
+
+Exit code: 0
